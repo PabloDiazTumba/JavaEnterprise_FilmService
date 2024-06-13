@@ -13,10 +13,32 @@
         }
         h1 {
             margin-bottom: 20px;
+            color: #007bff;
         }
         .success-message {
             color: #28a745;
             margin-top: 10px;
+        }
+        .user-info {
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: left;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .user-info p {
+            margin-bottom: 10px;
+        }
+        .user-info span {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .user-info .user-data {
+            color: #007bff;
         }
         button {
             margin-top: 20px;
@@ -35,25 +57,22 @@
         a {
             color: #007bff;
             text-decoration: none;
-            margin-top: 20px;
             display: inline-block;
+            margin-top: 20px;
+            transition: color 0.3s ease;
         }
         a:hover {
             text-decoration: underline;
+            color: #0056b3;
         }
     </style>
 </head>
 <body>
 <h1>Registration Successful</h1>
-<p>Your registration was successful. You have been registered with the following credentials:</p>
-<p>
-    <span>Email:</span>
-    <span th:text="${user.email}"></span>
-</p>
-<p>
-    <span>Password:</span>
-    <span th:text="${user.password}"></span>
-</p>
+<div class="user-info">
+    <p><span>Email:</span> <span class="user-data" th:text="${user.email}"></span></p>
+    <p><span>Password:</span> <span class="user-data" th:text="${user.password}"></span></p>
+</div>
 
 <button onclick="location.href='/admin'">Go to Admin Page</button>
 
