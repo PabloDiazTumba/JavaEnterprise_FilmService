@@ -79,7 +79,6 @@
         <th>ID</th>
         <th>Email</th>
         <th>Role</th>
-        <th>Action</th>
     </tr>
     </thead>
     <tbody>
@@ -87,16 +86,11 @@
         <td th:text="${user.id}"></td>
         <td th:text="${user.email}"></td>
         <td th:text="${user.role}"></td>
-        <td>
-            <form th:action="@{/users/delete/{userId}(userId=${user.id})}" method="post">
-                <button type="submit" class="action-button">Delete</button>
-            </form>
-        </td>
     </tr>
     </tbody>
 </table>
 
-<button onclick="location.href='/admin'" class="admin-button">Go to Admin Page</button>
+<button onclick="location.href='/admin'" class="admin-button">Back to Admin Page</button>
 
 <div>
     <a href="/logout" th:href="@{/logout}" class="action-button">Logout</a>
