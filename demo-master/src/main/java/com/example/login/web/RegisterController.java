@@ -2,16 +2,22 @@ package com.example.login.web;
 
 import com.example.login.model.User;
 import com.example.login.model.UserDTO;
-import com.example.login.model.UserRepository;
+import com.example.login.repository.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import org.jboss.aerogear.security.otp.api.Base32;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+
+import java.util.List;
 
 @Controller
 public class RegisterController {
@@ -33,21 +39,15 @@ public class RegisterController {
     }
 
     @PostMapping("/register")
-    public String registerUser(@Valid @ModelAttribute("user") UserDTO userDTO, BindingResult bindingResult, Model model) {
-
+    public String registerUser(@Valid @ModelAttribute("user") UserDTO userDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            System.out.println("Error");
             return "register_form";
         } else {
             User user = new User();
             user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
             user.setEmail(userDTO.getEmail());
-            user.setSecret(Base32.random());
             user.setRole("USER");
             userRepository.save(user);
-
-            model.addAttribute(user);
-
             return "register_success";
         }
     }
@@ -60,17 +60,36 @@ public class RegisterController {
     @GetMapping("/login")
     public String loginPage(Model model) {
         model.addAttribute("user", new UserDTO());
-        return "Login";
+        return "login";
     }
 
-    @GetMapping("/admin/home")
+    @GetMapping("/admin")
     public String adminPage(){
-        return "AdminPage";
+        return "adminPage";
     }
 
-    @GetMapping("/user/home")
-    public String userPage(@ModelAttribute("user") UserDTO user, Model model){
-        model.addAttribute( "user", user );
+    @GetMapping("/users")
+    public String userPage( Model model){
+        List<User> users = userRepository.findAll();
+        model.addAttribute( "users", users );
         return "userPage";
     }
+
+    @PostMapping("/users/delete/{userId}")
+    public String deleteUser(@PathVariable("userId") Long userId) {
+        userRepository.deleteById(userId);
+        return "redirect:/admin/delete-success";
+    }
+
+    @GetMapping("/admin/delete-success")
+    public String deleteSuccess() {
+        return "delete_success";
+    }
+
+    @GetMapping("/logout")
+    public String logout(HttpServletRequest request, HttpServletResponse response) {
+        new SecurityContextLogoutHandler().logout(request, response, SecurityContextHolder.getContext().getAuthentication());
+        return "redirect:/login";
+    }
+
 }
