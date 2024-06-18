@@ -86,19 +86,13 @@
     <tr th:each="user : ${users}">
         <td th:text="${user.id}"></td>
         <td th:text="${user.email}"></td>
-        <td th:text="${user.role}"></td>
         <td>
-            <form th:action="@{/users/delete/{userId}(userId=${user.id})}" method="post" onsubmit="return confirm('Are you sure you want to delete this user?');">
-                <button type="submit" class="action-button">Delete</button>
-                <!-- Include CSRF token -->
-                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
-            </form>
         </td>
     </tr>
     </tbody>
 </table>
 
-<button onclick="location.href='/admin'" class="admin-button">Go to Admin Page</button>
+<button onclick="location.href='/admin'" class="admin-button">Back to Admin Page</button>
 
 <div>
     <a href="/logout" th:href="@{/logout}" class="action-button">Logout</a>

@@ -3,19 +3,20 @@ package com.example.login.web;
 import com.example.login.model.User;
 import com.example.login.model.UserDTO;
 import com.example.login.repository.UserRepository;
+import com.example.login.service.AdminDetailsService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -24,12 +25,14 @@ public class RegisterController {
 
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
+    private final AdminDetailsService adminDetailsService;
+    private final UserDetailsService userDetailsService;
 
-
-    public RegisterController(PasswordEncoder passwordEncoder, UserRepository userRepository) {
+    public RegisterController(PasswordEncoder passwordEncoder, UserRepository userRepository, AdminDetailsService adminDetailsService, @Qualifier("userDetailsService") UserDetailsService userDetailsService) {
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
-
+        this.adminDetailsService = adminDetailsService;
+        this.userDetailsService = userDetailsService;
     }
 
     @GetMapping("/register")
@@ -43,7 +46,6 @@ public class RegisterController {
         if (bindingResult.hasErrors()) {
             return "register_form";
         } else {
-
             if (userRepository.existsByEmail(userDTO.getEmail())) {
                 model.addAttribute("emailError", "Email is already registered");
                 return "register_form";
@@ -70,26 +72,51 @@ public class RegisterController {
     }
 
     @GetMapping("/admin")
-    public String adminPage(){
+    public String adminPage() {
         return "adminPage";
     }
 
     @GetMapping("/users")
-    public String userPage( Model model){
+    public String userPage(Model model) {
         List<User> users = userRepository.findAll();
-        model.addAttribute( "users", users );
+        model.addAttribute("users", users);
         return "userPage";
     }
 
-    @PostMapping("/users/delete/{userId}")
-    public String deleteUser(@PathVariable("userId") Long userId, HttpServletRequest request) {
-        userRepository.deleteById(userId);
-        return "redirect:/admin/delete-success";
+    @GetMapping("/delete")
+    public String deleteForm(Model model) {
+        List<User> users = userRepository.findAll();
+        model.addAttribute("users", users);
+        model.addAttribute("email", "");
+        return "delete_form";
     }
 
-    @GetMapping("/admin/delete-success")
+    @PostMapping("/delete")
+    public String deleteUser(@ModelAttribute("email") String email, Model model, Authentication authentication) {
+        User user = userRepository.findByEmail(email);
+
+        if (user == null) {
+            model.addAttribute("error", "User not found");
+            return "delete_error";
+        }
+
+        if (user.getEmail().equals(authentication.getName())) {
+            model.addAttribute("error", "Admin cannot delete themselves");
+            return "delete_error";
+        }
+
+        userRepository.delete(user);
+        return "redirect:/delete_success";
+    }
+
+    @GetMapping("/delete_success")
     public String deleteSuccess() {
         return "delete_success";
+    }
+
+    @GetMapping("/delete-error")
+    public String deleteError() {
+        return "delete_error";
     }
 
     @GetMapping("/logout")

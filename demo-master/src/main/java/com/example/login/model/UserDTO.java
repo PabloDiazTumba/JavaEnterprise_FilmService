@@ -1,5 +1,6 @@
 package com.example.login.model;
 
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -42,12 +43,15 @@ public class UserDTO implements Serializable {
         this.password = password;
     }
 
-    // Custom validation method for email format
+    // Optional: Custom validation method for email format
+    // Uncomment if needed
+    /*
     public boolean isEmailValid() {
         // Regular expression for a simple email format check
         String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
         return email.matches(emailRegex);
     }
+    */
 
     @Override
     public String toString() {
