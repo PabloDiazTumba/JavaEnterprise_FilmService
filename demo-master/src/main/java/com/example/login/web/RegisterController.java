@@ -28,7 +28,9 @@ public class RegisterController {
     private final AdminDetailsService adminDetailsService;
     private final UserDetailsService userDetailsService;
 
-    public RegisterController(PasswordEncoder passwordEncoder, UserRepository userRepository, AdminDetailsService adminDetailsService, @Qualifier("userDetailsService") UserDetailsService userDetailsService) {
+    public RegisterController(PasswordEncoder passwordEncoder, UserRepository userRepository,
+                              AdminDetailsService adminDetailsService, @Qualifier("userDetailsService")
+                              UserDetailsService userDetailsService) {
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
         this.adminDetailsService = adminDetailsService;
@@ -42,7 +44,8 @@ public class RegisterController {
     }
 
     @PostMapping("/register")
-    public String registerUser(@Valid @ModelAttribute("user") UserDTO userDTO, BindingResult bindingResult, Model model) {
+    public String registerUser(@Valid @ModelAttribute("user") UserDTO userDTO, BindingResult bindingResult,
+                               Model model) {
         if (bindingResult.hasErrors()) {
             return "register_form";
         } else {
@@ -124,5 +127,4 @@ public class RegisterController {
         new SecurityContextLogoutHandler().logout(request, response, SecurityContextHolder.getContext().getAuthentication());
         return "redirect:/login";
     }
-
 }
