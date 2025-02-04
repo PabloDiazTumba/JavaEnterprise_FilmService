@@ -25,20 +25,18 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf().ignoringRequestMatchers("/api/auth/register", "/api/auth/login", "/h2-console/**") // Ignorera CSRF för dessa endpoints, inklusive H2-konsolen
-                .and()
-                .authorizeRequests()
-                .requestMatchers("/api/auth/register", "/api/auth/login", "/h2-console/**").permitAll()  // Tillåt utan autentisering för H2
-                .anyRequest().authenticated()  // Alla andra endpoints kräver autentisering
-                .and()
-                .formLogin()
-                .defaultSuccessUrl("/home", true)  // Omdirigerar användaren till "/home"
-                .permitAll()
-                .and()
-                .logout().permitAll();
-
-        // Tillåt att vi öppnar H2-konsolen i en webbläsare
-        http.headers().frameOptions().sameOrigin(); // Tillåt visning av H2-konsolen i en iframe
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .anyRequest().authenticated()
+                )
+                .httpBasic(httpBasic -> {})
+                .formLogin(form -> form.disable()) // Inaktivera form-login om det behövs
+                .exceptionHandling(ex ->
+                        ex.authenticationEntryPoint((request, response, authException) -> {
+                            response.sendError(401, "Unauthorized");
+                        })
+                );
 
         return http.build();
     }

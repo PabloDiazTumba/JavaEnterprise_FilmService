@@ -19,14 +19,15 @@ public class AuthenticationController {
 
     // Inloggning endpoint
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestParam String username, @RequestParam String password) {
+    public ResponseEntity<String> login(@RequestParam String username, @RequestParam String password) {
         try {
+            // Försök autentisera användaren
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(username, password)
             );
-            return ResponseEntity.ok().body("{\"message\": \"Login successful\", \"redirect\": \"/home\"}");
+            return ResponseEntity.ok("Login successful");
         } catch (Exception e) {
-            return ResponseEntity.status(401).body("{\"error\": \"Invalid credentials\"}");
+            return ResponseEntity.status(401).body("Invalid credentials");
         }
     }
 }

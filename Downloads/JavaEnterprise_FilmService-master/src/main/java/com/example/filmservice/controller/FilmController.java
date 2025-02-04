@@ -4,6 +4,7 @@ import com.example.filmservice.service.TmdbService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
+@RequestMapping("/api/movies")  // Lägg till bas-URL här
 public class FilmController {
 
     private final TmdbService tmdbService;
@@ -30,7 +32,7 @@ public class FilmController {
     // Hämta alla filmer
     @GetMapping("/all")
     public ResponseEntity<List<Map<String, Object>>> getAllFilms() {
-        List<Map<String, Object>> allFilms = tmdbService.getAllMovies(); // Se till att den här metoden finns
+        List<Map<String, Object>> allFilms = tmdbService.getAllMovies();
         return ResponseEntity.ok(allFilms);
     }
 
